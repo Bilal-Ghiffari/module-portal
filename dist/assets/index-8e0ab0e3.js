@@ -1,1 +1,0 @@
-import{U as s,j as a,C as r}from"./index-cb7bfd5e.js";const i=()=>{const e=s(),n=new URLSearchParams(e.search).get("id_permohonan");return a.jsxs(r,{className:"page-content",fluid:!0,children:[a.jsx("h1",{children:"Halaman SK Digital Tetap WNI"}),a.jsxs("p",{children:["ID Permohonan: ",n]})]})};export{i as default};
