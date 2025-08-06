@@ -1,0 +1,1 @@
+import{b3 as o,cS as r,cT as e}from"./index-1205c25f.js";const l=o(r)(({theme:t})=>({[`&.${e.alternativeLabel}`]:{top:10},[`& .${e.line}`]:{transition:"all 0.4s ease",borderTopWidth:2,borderColor:"#E7E7E7",borderTopStyle:"dashed"},[`&.${e.active} .${e.line}`]:{borderColor:"#041662"},[`&.${e.completed} .${e.line}`]:{borderColor:"#041662"}}));export{l as C};
