@@ -58,7 +58,7 @@ export const modules_constant = [
   {
     iconImg: image10,
     // url: "http://localhost:8005/ahu-koperasi/dashboard",
-    url: "/ahu-koperasi/dashboard",
+    url: `${window.location.origin}/ahu-koperasi/dashboard"`,
     color: "#FDF3F3",
     r_modules_code: "25",
     module: "Koperasi",
