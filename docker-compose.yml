@@ -4,6 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: AHU_${APPNAME}
+    volumes:
+      - ./dist:/app/dist
     ports:
       - "${PORT}:3000"
     env_file:
