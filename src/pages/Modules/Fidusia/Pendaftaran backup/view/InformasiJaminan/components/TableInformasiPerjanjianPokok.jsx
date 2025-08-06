@@ -1,0 +1,186 @@
+import { formatRupiah } from '@/helpers/services/changeFormatRupiah';
+import {
+  Box,
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+  TextField,
+} from '@mui/material';
+import { useMemo, useState } from 'react';
+import { AiFillDelete } from 'react-icons/ai';
+
+const TableInformasiPerjanjianPokok = ({
+  data = [],
+  formik,
+  showSelect = true,
+  exchangeRates,
+  onEditRow,
+  onDeleteRow,
+  calculateNominalRupiah,
+  kurs,
+}) => {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleCheckboxChange = (row) => {
+    const current = formik.values.perjanjian_pokok || [];
+    const exists = current.some((item) => item.id === row.id);
+    const newSelected = exists
+      ? current.filter((item) => item.id !== row.id)
+      : [...current, row];
+
+    formik.setFieldValue('information_jaminan.perjanjian_pokok', newSelected);
+  };
+
+  const columns = [
+    // ...(showSelect
+    //   ? [
+    //       {
+    //         id: 'pilih',
+    //         label: 'Pilih',
+    //         cell: (row) => (
+    //           <Checkbox
+    //             color="primary"
+    //             checked={formik.values?.perjanjian_pokok?.some(
+    //               (item) => item.id === row.id
+    //             )}
+    //             onChange={() => handleCheckboxChange(row)}
+    //           />
+    //         ),
+    //       },
+    //     ]
+    //   : []),
+    { id: 'id_perjanjian_pokok', label: 'No', align: 'center' },
+    { id: 'kurs', label: 'KURS', align: 'center' },
+    {
+      id: 'nilai_nominal',
+      label: 'Nominal',
+      align: 'center',
+      cell: (row) => (
+        <TextField
+          variant="outlined"
+          size="small"
+          onChange={(e) => {
+            const value = parseFloat(e.target.value) || 0;
+            const updatedData = data.map((item) =>
+              item.id === row.id
+                ? {
+                    ...item,
+                    nilai_nominal: value,
+                    nilai_nominal_rupiah: calculateNominalRupiah(
+                      item.kurs,
+                      value
+                    ),
+                  }
+                : item
+            );
+            formik.setFieldValue(
+              'information_jaminan.perjanjian_pokok',
+              updatedData
+            );
+          }}
+          value={row.nilai_nominal}
+          type="number"
+        />
+      ),
+    },
+    {
+      id: 'nilai_nominal_rupiah',
+      label: 'Nominal Rupiah',
+      align: 'center',
+      cell: (row) => {
+        const nilai_nominal_rupiah =
+          row.nilai_nominal_rupiah !== undefined
+            ? row.nilai_nominal_rupiah
+            : calculateNominalRupiah(row.kurs, row.nominal, exchangeRates);
+
+        return formatRupiah(nilai_nominal_rupiah);
+      },
+    },
+    { id: 'terbilang_nominal', label: 'Sebutan', align: 'center' },
+    {
+      id: 'actions',
+      label: 'Actions',
+      align: 'center',
+      cell: (row) => (
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          {/* <IconButton
+            color="primary"
+            onClick={() => onEditRow(row)}
+            aria-label="edit"
+            size="small"
+          >
+            <AiFillEdit />
+          </IconButton> */}
+          <IconButton
+            color="secondary"
+            onClick={() => onDeleteRow(row.id_perjanjian_pokok, data)}
+            aria-label="delete"
+            size="small"
+          >
+            <AiFillDelete />
+          </IconButton>
+        </Box>
+      ),
+    },
+  ];
+
+  const filteredData = useMemo(() => {
+    if (!searchTerm) return data;
+    const lowerSearch = searchTerm.toLowerCase();
+    return data.filter((item) =>
+      Object.values(item).some((val) =>
+        val?.toString().toLowerCase().includes(lowerSearch)
+      )
+    );
+  }, [data, searchTerm]);
+
+  return (
+    <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+      <Box sx={{ p: 2, display: 'flex', alignItems: 'center' }}>
+        <TextField
+          variant="outlined"
+          placeholder="Cari..."
+          size="small"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          sx={{ marginRight: 2 }}
+        />
+      </Box>
+      <TableContainer>
+        <Table stickyHeader aria-label="sticky table">
+          <TableHead>
+            <TableRow>
+              {columns.map((column) => (
+                <TableCell key={column.id} align={column.align}>
+                  <TableSortLabel>{column.label}</TableSortLabel>
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredData.map((row) => (
+              <TableRow hover key={row.id}>
+                {columns.map((column) => {
+                  const cell = column.cell ? column.cell(row) : row[column.id];
+                  return (
+                    <TableCell key={column.id} align={column.align}>
+                      {cell}
+                    </TableCell>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Paper>
+  );
+};
+
+export default TableInformasiPerjanjianPokok;

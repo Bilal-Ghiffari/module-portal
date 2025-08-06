@@ -1,0 +1,91 @@
+export const STEP_FIELDS = [
+  // Step 0 input voucher
+  ["voucher"],
+
+  // Step 1: Identitas Pemohon
+  [
+    // Informasi Anak / Pemohon
+    "nama_lengkap_pemohon",
+    "nik_pemohon",
+    "no_hp_pemohon",
+    "no_telp_pemohon",
+    "jenis_kelamin_pemohon",
+    "status_kawin_pemohon",
+    "email_pemohon",
+    "id_pekerjaan_pemohon",
+    "id_kab_kota_lahir_pemohon",
+    "tgl_lahir_pemohon",
+    "id_kwn_pemohon",
+    "id_kwn_asing_pemohon",
+    "tempat_lahir_pemohon",
+    "id_provinsi_lahir_pemohon",
+    "id_kab_kota_lahir_pemohon",
+    "id_negara_lahir_pemohon",
+
+    // Alamat Pemohon
+    "tempat_tinggal_pemohon",
+    "id_negara_tinggal_pemohon",
+    "id_prov_tinggal_pemohon",
+    "id_kab_kota_tinggal_pemohon",
+    "alamat_tinggal_pemohon",
+
+    // Dokumen Kelahiran
+    "no_akta_lahir_pemohon",
+    "tgl_akta_lahir_pemohon",
+
+    // Dokumen Perkawinan Orang Tua
+    "no_akta_kawin_ortu_pemohon",
+    "tgl_akta_kawin_ortu_pemohon",
+
+    // Dokumen Perjalanan
+    "no_paspor_ri_pemohon",
+    "id_wilayah_paspor_ri_pemohon",
+    "tgl_exp_paspor_ri_pemohon",
+    "no_paspor_kebangsaan_pemohon",
+    "id_negara_paspor_kebangsaan_pemohon",
+    "tgl_exp_paspor_kebangsaan_pemohon",
+
+    // Dokumen Keimigrasian
+    "no_dok_keimigrasian_pemohon",
+    "tgl_dok_keimigrasian_pemohon",
+  ],
+
+  [
+    // Data Ayah
+    "nama_lengkap_ayah",
+    "status_kawin_ayah",
+    "email_ayah",
+    "nomor_hp_ayah",
+    "id_kwn_asal_ayah",
+    "alamat_tinggal_ayah",
+    "tempat_lahir_ayah",
+    "id_provinsi_lahir_ayah",
+    "id_kab_kota_lahir_ayah",
+    "id_negara_lahir_ayah",
+    "tgl_lahir_ayah",
+
+    // Data Ibu
+    "nama_lengkap_ibu",
+    "status_kawin_ibu",
+    "email_ibu",
+    "nomor_hp_ibu",
+    "id_kwn_asal_ibu",
+    "alamat_tinggal_ibu",
+    "tempat_lahir_ibu",
+    "id_provinsi_lahir_ibu",
+    "id_kab_kota_lahir_ibu",
+    "id_negara_lahir_ibu",
+    "tgl_lahir_ibu",
+  ],
+  // Step 3 Surat permohonan
+  ["suratPermohonan"],
+  // Step 4 Unggah Dokumen
+  [
+    "kutipanAktaKelahiran",
+    "kutipanAktaPerkawinan",
+    "pasporRepublik",
+    "ktp",
+    "keputusanMenteri",
+    "pasFoto",
+  ],
+];

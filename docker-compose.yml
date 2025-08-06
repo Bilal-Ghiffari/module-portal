@@ -1,0 +1,10 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: AHU_${APPNAME}
+    ports:
+      - "${PORT}:3000"
+    env_file:
+      - .env

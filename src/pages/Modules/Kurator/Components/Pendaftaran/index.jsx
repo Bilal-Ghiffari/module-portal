@@ -1,0 +1,360 @@
+import React, { useState, useEffect } from "react";
+import Box from "@mui/material/Box";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import Button from "@mui/material/Button";
+import { ToastifyService } from "../../../../../components/Toastify/toastifyService";
+import { useFormik } from "formik";
+// import { validationSchema } from "./validation";
+import * as url from "../../../../../helpers/url_helper";
+import {
+  errorMsg,
+  successMsg,
+} from "../../../../../helpers/Notification/toastNotification";
+import dayjs from "dayjs";
+// Pages
+import Swal from "sweetalert2";
+import { filterEmptyValues } from "@/helpers/services/convert";
+import { ArrowForward } from "@mui/icons-material";
+import OnBoardingPendaftaran from "./OnBoarding";
+
+// dummy dulu, buat validasi di setiap step
+const stepFields = [
+  ["nama_perseroan", "voucher"],
+  ["checked"],
+  ["checked"],
+  ["checked"],
+  ["checked"],
+];
+
+import DynamicStep from "./DynamicStep";
+import { StepLabel, Typography } from "@mui/material";
+import Detail from "../Detail";
+
+const PendaftaranKurator = ({ label = "Pendaftaran Kurator" }) => {
+  const [activeStep, setActiveStep] = useState(0);
+  const [skipped, setSkipped] = useState(new Set());
+  const isStepSkipped = (step) => skipped.has(step);
+  const toastifyService = new ToastifyService();
+
+  console.log("activeStep", activeStep);
+
+  const formik = useFormik({
+    initialValues: {
+      notaris: [
+        {
+          nama_notaris: "",
+          kedudukan: "",
+          no_akta: "",
+          tanggal_akta: "",
+          perihal_akta: "",
+          dokumen_akta: null,
+        },
+      ],
+    },
+    enableReinitialize: true,
+    // validationSchema,
+    onSubmit: (values) => {
+      toastifyService.confirmationCreate().then((res) => {
+        if (res) {
+          // toastifyService.showLoading();
+          const payload = {
+            ...values,
+          };
+          console.log("payload", payload);
+          toastifyService.info("API Belum tersedia");
+          // postFormData(url.SP_POST_EVALUASI_DATA_IG, payload)
+          //   .then(() => {
+          //     successMsg("success");
+          //     setValue(0);
+          //     Swal.close();
+          //   })
+          //   .catch((err) => {
+          //     errorMsg(err);
+          //     Swal.close();
+          //   });
+        }
+      });
+    },
+  });
+
+  useEffect(() => {
+    setActiveStep(0);
+    formik.resetForm();
+  }, [label]);
+
+  console.log("formik", formik.values);
+
+  const handleNext = () => {
+    const currentStepFields = stepFields[activeStep];
+
+    formik.validateForm().then((errors) => {
+      const stepErrors = currentStepFields.reduce((acc, field) => {
+        if (errors[field]) {
+          acc[field] = errors[field];
+        }
+        return acc;
+      }, {});
+
+      if (Object.keys(stepErrors).length === 0) {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        setSkipped((prevSkipped) => {
+          const newSkipped = new Set(prevSkipped.values());
+          newSkipped.delete(activeStep);
+          return newSkipped;
+        });
+      } else {
+        formik.setTouched({
+          ...formik.touched,
+          ...currentStepFields.reduce((acc, field) => {
+            acc[field] = true;
+            return acc;
+          }, {}),
+        });
+      }
+    });
+  };
+
+  const handleSubmit = async (status) => {
+    formik.validateForm().then((errors) => {
+      if (Object.keys(errors).length === 0) {
+        formik.setFieldValue("status", status);
+        formik.submitForm();
+      } else {
+        formik.setTouched(
+          Object.keys(errors).reduce((acc, key) => {
+            acc[key] = true;
+            return acc;
+          }, {})
+        );
+      }
+    });
+  };
+
+  const allSteps = [
+    {
+      id: "1",
+      label: "Boarding",
+      // icon: FiUser,
+      component: (
+        <OnBoardingPendaftaran
+          formik={formik}
+          setActiveStep={setActiveStep}
+          label={label}
+        />
+      ),
+    },
+    {
+      id: "2",
+      label: "Identitas Pemohon",
+      stepNumber: "Langkah 1",
+      component: <DynamicStep formik={formik} label="Informasi Pemohon" />,
+    },
+    {
+      id: "3",
+      label: "Informasi Dokumen",
+      stepNumber: "Langkah 2",
+      component: <DynamicStep formik={formik} label={"Informasi Dokumen"} />,
+    },
+    {
+      id: "4",
+      label: "Unggah Dokumen",
+      stepNumber: "Langkah 3",
+      component: <DynamicStep formik={formik} label={"Unggah Dokumen"} />,
+    },
+    {
+      id: "5",
+      label: "Formulir Permohonan",
+      stepNumber: "Langkah 1",
+      component: <DynamicStep formik={formik} label={"Formulir Permohonan"} />,
+    },
+    {
+      id: "6",
+      label: "Konfirmasi Data",
+      stepNumber: "Langkah 4",
+    },
+    // untuk laporan berkala
+    {
+      id: "7",
+      label: "Laporan Berkala",
+      stepNumber: "Langkah 1",
+      component: <DynamicStep formik={formik} label={label} />,
+    },
+    {
+      id: "8",
+      label: "Form Laporan Berkala",
+      stepNumber: "Langkah 1",
+      component: <DynamicStep formik={formik} label={`Form ${label}`} />,
+    },
+  ];
+
+  const stepsConfig = {
+    "Pendaftaran Kurator": ["1", "2", "3", "4", "6"],
+    "Perpanjangan Kurator": ["1", "5"],
+    "Laporan Berkala Pengurus": ["7", "8"],
+    "Laporan Berkala Kurator": ["7", "8"],
+  };
+
+  // ambil id step yg ingin dipakai sesuai label
+  const activeStepIds = stepsConfig[label] || [];
+
+  // hasil akhirnya: hanya steps yg id-nya ada di activeStepIds
+  const stepsResult = allSteps.filter((step) =>
+    activeStepIds.includes(step.id)
+  );
+
+  const visibleStepperSteps = stepsResult.filter((s) => s.stepNumber);
+  const stepperActiveStep = visibleStepperSteps.findIndex(
+    (s) => s.id === stepsResult[activeStep]?.id
+  );
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  return (
+    <Box className="bg-white page-content mb-4" sx={{ width: "100%" }}>
+      {label.includes("Laporan Berkala") && (
+        <Typography className="fw-bold px-4">Tambah {label}</Typography>
+      )}{" "}
+      {visibleStepperSteps.length > 0 &&
+        stepperActiveStep >= 0 &&
+        label === "Pendaftaran Kurator" && (
+          <Stepper activeStep={stepperActiveStep}>
+            {visibleStepperSteps.map((step, index) => {
+              const stepProps = {};
+              if (isStepSkipped(index)) {
+                stepProps.completed = false;
+              }
+
+              return (
+                <Step key={step.id} {...stepProps}>
+                  <StepLabel
+                    StepIconComponent={({ active, completed }) => (
+                      <div
+                        style={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: "50%",
+                          border: "1px solid #E7E7E7",
+                          backgroundColor:
+                            active || completed ? "#041662" : "#fff",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: active || completed ? "#fff" : "#041662",
+                        }}
+                      >
+                        {index + 1}
+                      </div>
+                    )}
+                  >
+                    <span
+                      style={{
+                        fontFamily: "Poppins",
+                        fontWeight: 400,
+                        fontSize: "12px",
+                        lineHeight: "18px",
+                        color: "#888888",
+                      }}
+                    >
+                      {step.label}
+                    </span>
+                  </StepLabel>
+                </Step>
+              );
+            })}
+          </Stepper>
+        )}
+      <React.Fragment>
+        {activeStep == stepsResult.length - 1 &&
+        label === "Pendaftaran Kurator" ? (
+          <>
+            <Detail formik={formik} />
+          </>
+        ) : (
+          <Box sx={{ mt: 2, mb: 3 }}>
+            {stepsResult[activeStep]?.component || "Unknown step"}
+          </Box>
+        )}
+
+        {(label.includes("Laporan Berkala") || activeStep >= 1) && (
+          <Box sx={{ display: "flex", flexDirection: "row", pt: 2, px: 2 }}>
+            <Button
+              disabled={activeStep === 0}
+              onClick={handleBack}
+              sx={{
+                mr: 1,
+                backgroundColor: "#e5e7eb",
+                color: "#000",
+                px: 2,
+                py: 1,
+                textTransform: "initial",
+                fontFamily: "Poppins",
+                "&:hover": {
+                  backgroundColor: "#d1d5db",
+                  color: "#000",
+                },
+              }}
+            >
+              Kembali
+            </Button>
+            <Box sx={{ flex: "1 1 auto" }} />
+            <div className="d-flex gap-2">
+              {label !== "Pembubaran Data" && (
+                <Button
+                  onClick={() => handleSubmit("submit", "draf")}
+                  sx={{
+                    backgroundColor: "#f97316",
+                    color: "#fff",
+                    px: 2,
+                    py: 1,
+                    fontFamily: "Poppins",
+                    textTransform: "initial",
+                    "&:hover": {
+                      backgroundColor: "#ea580c",
+                      color: "#fff",
+                    },
+                  }}
+                >
+                  Draft
+                </Button>
+              )}
+
+              <Button
+                onClick={() => {
+                  if (activeStep === stepsResult.length - 1) {
+                    handleSubmit("submit");
+                  } else {
+                    handleNext();
+                  }
+                }}
+                sx={{
+                  mr: 1,
+                  backgroundColor: "#041662",
+                  color: "#fff",
+                  border: "1px solid grey",
+                  px: 2,
+                  py: 1,
+                  fontFamily: "Poppins",
+                  "&:hover": {
+                    backgroundColor: "#041992",
+                    color: "#fff",
+                  },
+                  textTransform: "initial",
+                }}
+              >
+                {activeStep === stepsResult.length - 1
+                  ? "Selesai"
+                  : "Selanjutnya"}
+                <ArrowForward fontSize="14" />
+              </Button>
+            </div>
+          </Box>
+        )}
+      </React.Fragment>
+    </Box>
+  );
+};
+
+export default PendaftaranKurator;

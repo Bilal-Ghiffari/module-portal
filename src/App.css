@@ -1,0 +1,608 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+.table-wrapper {
+  position: relative;
+}
+
+.table-scroll {
+  overflow-x: scroll;
+  position: relative;
+}
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  /* Warna background untuk indikator */
+  background-color: #e0e0e0;
+}
+
+.table-scroll::-webkit-scrollbar {
+  height: 12px;
+  /* Ubah tinggi scrollbar di sini */
+}
+
+.table-scroll::-webkit-scrollbar-thumb {
+  background-color: #0056a5;
+  /* Warna indikator scroll */
+  border-radius: 6px;
+}
+
+/* Firefox Scrollbar */
+.table-scroll {
+  scrollbar-color: #0056a5 #e0e0e0;
+  scrollbar-width: 12px;
+  /* Ubah tinggi scrollbar di sini untuk Firefox */
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: spin 2s linear infinite;
+  /* Adjust the speed of the spinning if needed */
+}
+
+.custom-swal-popup {
+  position: fixed !important;
+  /* Use fixed positioning to anchor to the top of the viewport */
+  top: 150px !important;
+  /* Set to 0px to be at the very top of the screen */
+  left: 50% !important;
+  /* Center horizontally */
+  transform: translateX(-50%) !important;
+  /* Adjust to center the popup horizontally */
+  margin: 0 !important;
+}
+
+.custom-swal-title {
+  color: #041662;
+  font-weight: bold;
+}
+
+.custom-swal-content {
+  font-size: 0.95rem;
+}
+
+.action-menu {
+  min-width: 170px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  padding: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.action-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.action-item i {
+  color: #6c757d;
+}
+
+.action-item:hover {
+  background-color: #f8f9fa;
+  cursor: pointer;
+}
+
+.action-item a {
+  font-weight: 500;
+  color: #343a40;
+  transition: color 0.2s ease;
+}
+
+.action-item a:hover {
+  color: #007bff;
+}
+
+.dripicons-gear {
+  transition: transform 0.3s ease;
+}
+
+.dripicons-gear:hover {
+  transform: rotate(90deg);
+}
+
+/* Maps */
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip-container {
+  background: none;
+  box-shadow: none;
+}
+
+.leaflet-popup-tip {
+  display: none;
+}
+
+.leaflet-popup-content-wrapper {
+  background: rgba(0, 0, 0, 0.7) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.leaflet-popup-close-button {
+  display: none;
+  /* Sembunyikan tombol close jika diinginkan */
+}
+
+.h-full-screen {
+  height: 100vh;
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.custom-border-bottom {
+  border-bottom: 3px solid white;
+}
+
+/* Captcha css */
+.captcha-container canvas {
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Other css */
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-disable {
+  cursor: not-allowed;
+}
+
+.font-size-header {
+  font-size: 10px;
+  /* Default untuk mobile atau perangkat kecil */
+}
+
+.w-search-portal {
+  width: 220px !important;
+}
+
+.width-image {
+  width: 50px;
+}
+
+.fs-smaller {
+  font-size: 0.5rem;
+}
+
+.border-bottom-left-radius {
+  border-radius: 20px;
+  border-bottom-left-radius: 50px;
+}
+
+.border-bottom-right-radius {
+  border-radius: 20px;
+  border-bottom-right-radius: 50px;
+}
+
+.slick-slide {
+  padding: 0 5px;
+}
+
+.carousel-item .d-flex {
+  min-height: 160px;
+  min-width: 100px;
+}
+
+.carousel-item .row {
+  width: 100%;
+  margin: 0;
+}
+
+.carousel-item .col-2 {
+  flex: 0 0 auto;
+  width: 20%;
+  /* Adjust this width to match the design */
+}
+
+.custom-arrow {
+  cursor: pointer;
+  z-index: 1;
+}
+
+.custom-prev-arrow {
+  left: 10px;
+}
+
+.custom-next-arrow {
+  right: 10px;
+}
+
+.option-item:hover {
+  background-color: #50a5f1;
+  color: white;
+  transition: all ease;
+  user-select: none;
+}
+
+.top-card-pengawasan {
+  top: 20px;
+}
+
+.dropdown-item:hover {
+  font-weight: 700;
+  transition: all ease;
+  user-select: none;
+}
+
+.opacity-10 {
+  opacity: 0.1;
+}
+
+.card-hover {
+  transition: transform 0.3s ease, border-radius 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: scale(1.05);
+  cursor: pointer;
+  border-radius: 30px;
+}
+
+/* input number */
+.input-type-number::-webkit-inner-spin-button,
+.input-type-number::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.qr-code {
+  width: 90px;
+  height: 90px;
+}
+
+.fs-smaller {
+  font-size: 10px;
+}
+
+.hide-on-mobile {
+  display: none;
+}
+
+.font-cell {
+  font-size: 10px;
+}
+
+.shadow-md {
+  box-shadow: 0 4px 8px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.list-hover:hover {
+  background-color: black;
+}
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 60%;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-x: auto;
+  /* Enable horizontal scrolling */
+  overflow-y: auto;
+  /* Enable vertical scrolling if necessary */
+}
+
+.popup-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.floatingedges {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  width: 100%;
+}
+
+.reactflow-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.floatingedges .react-flow__handle {
+  opacity: 0;
+}
+
+.bold-border-bottom {
+  border-bottom: 5px solid;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper input {
+  width: 100%;
+  /* Memastikan input mengisi lebar yang tersedia */
+  padding-right: 10px;
+  /* Sesuaikan jika ada ikon atau teks tambahan di dalam input */
+}
+
+.input-wrapper .placeholder-text {
+  position: absolute;
+  left: 10px;
+  width: 100%;
+  padding-right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #7a7d81;
+  /* Warna placeholder */
+  white-space: nowrap;
+  /* Mencegah teks melampaui satu baris */
+  overflow: hidden;
+  /* Mencegah teks melampaui lebar input */
+  text-overflow: ellipsis;
+  /* Tambahkan elipsis jika teks terlalu panjang */
+}
+
+.input-wrapper input:focus + .placeholder-text,
+.input-wrapper input:not(:placeholder-shown) + .placeholder-text {
+  display: none;
+}
+
+.placeholder-text em {
+  font-style: italic;
+}
+
+.cursor-not-allowed {
+  cursor: not-allowed;
+}
+
+.custom-modal-width .modal-dialog {
+  min-width: 50% !important;
+  max-width: 90% !important;
+}
+
+.font-size-breadcrumb-v {
+  font-size: 10px;
+}
+
+.kusuka-dashboard {
+  .apexcharts-yaxis.text,
+  .apexcharts-xaxis.text {
+    font-size: 9px;
+  }
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+  color: #222736 !important;
+}
+
+/* Code untuk custom tabs active mui */
+.css-1aquho2-MuiTabs-indicator {
+  background-color: transparent !important;
+}
+
+.css-1h9z7r5-MuiButtonBase-root-MuiTab-root.Mui-selected {
+  color: #fff !important;
+  border: 1px solid #000;
+  border-radius: 2rem;
+  background-color: #1c77d1;
+  padding: 2px 16px !important;
+}
+
+.css-1h9z7r5-MuiButtonBase-root-MuiTab-root {
+  min-height: 30px !important;
+}
+/* Code untuk custom tabs active mui */
+
+.text-menu-active {
+  color: #d4af37 !important;
+}
+
+.handsontable > .wtHolder tr > td.htDimmed {
+  background-color: #f2f2f2;
+}
+
+/* remove increment input if type number  */
+
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield; /* Firefox */
+}
+/* Media query untuk perangkat tablet */
+@media (min-width: 768px) {
+  .carousel-item .d-flex {
+    min-height: 220px;
+    min-width: 100px;
+    width: 100%;
+  }
+
+  .custom-modal-width .modal-dialog {
+    min-width: 50% !important;
+    max-width: 70% !important;
+  }
+
+  .hide-on-mobile {
+    display: block;
+  }
+
+  .qr-code {
+    width: 80px;
+    height: 80px;
+  }
+
+  .width-image {
+    width: 60px;
+  }
+
+  .fs-smaller {
+    font-size: 0.75rem;
+  }
+
+  .font-size-header {
+    font-size: 12px;
+    /* Ukuran font untuk tablet */
+  }
+
+  .w-search-portal {
+    width: 260px !important;
+  }
+
+  .pt-md-15 {
+    padding-top: 15rem !important;
+  }
+
+  .top-card-pengawasan {
+    top: 35px;
+  }
+
+  .font-size-breadcrumb-v {
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 992px) {
+  .font-size-header {
+    font-size: 16px;
+    /* Ukuran font un
+    tuk desktop */
+  }
+
+  .w-search-portal {
+    width: 300px !important;
+  }
+
+  .logo-size {
+    width: 60px;
+  }
+
+  .fs-smaller {
+    font-size: 0.8rem;
+  }
+
+  .qr-code {
+    width: 100px;
+    height: 100px;
+  }
+
+  .custom-card {
+    width: 50%;
+  }
+
+  .top-card-pengawasan {
+    top: 20px;
+  }
+
+  .font-size-breadcrumb-v {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .top-card-pengawasan {
+    top: -100px;
+  }
+}
+
+.card-body-onboarding {
+  margin-top: 109px;
+  margin-left: 120px;
+  width: 698;
+  height: 372;
+  gap: 27px;
+}
+
+.card-body-onboarding-title {
+  color: #041662;
+  font-size: 28px;
+  font-weight: 500;
+}
+
+.card-body-onboarding-subtitle {
+  color: #5d5d5d;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.card-body-onboarding-hr {
+  border: 1px solid #ccd3db;
+}
+
+.card-body-onboarding-input {
+  width: 689px;
+  height: 46px;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  font-size: 14px !important;
+  background-color: #e7e7e7 !important;
+}
+
+.card-body-onboarding-input::placeholder {
+  color: #b0b0b0 !important;
+  opacity: 1;
+}
+
+.card-body-onboarding-input::-webkit-input-placeholder {
+  color: #b0b0b0 !important;
+}
+
+.card-body-onboarding-input::-moz-placeholder {
+  color: #b0b0b0 !important;
+  opacity: 1;
+}
+
+.card-body-onboarding-input:-ms-input-placeholder {
+  color: #b0b0b0 !important;
+}
+.step-no-padding {
+  border: 1px solid red;
+  padding: none !important;
+}

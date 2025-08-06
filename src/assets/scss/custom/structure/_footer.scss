@@ -1,0 +1,35 @@
+//
+// _footer.scss
+//
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  left: 250px;
+  right: 0;
+  padding: 20px;
+  color: white;
+  background-color: var(--#{$prefix}footer-bg);
+  // height: $footer-height; // pastikan nilai ini konsisten, misalnya: 80px
+  overflow: hidden;
+
+  @media (max-width: 991.98px) {
+    left: 0;
+  }
+}
+
+.vertical-collpsed {
+  .footer {
+    left: $sidebar-collapsed-width; // misal: 70px
+
+    @media (max-width: 991.98px) {
+      left: 0;
+    }
+  }
+}
+
+body[data-layout="horizontal"] {
+  .footer {
+    left: 0 !important;
+  }
+}

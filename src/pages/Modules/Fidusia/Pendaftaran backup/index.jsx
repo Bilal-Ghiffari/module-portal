@@ -1,0 +1,467 @@
+import { CustomButton } from '@/components/Common/Button';
+import { ToastifyService } from '@/components/Toastify/toastifyService';
+import { ArrowForward } from '@mui/icons-material';
+import { Box, Step, StepLabel, Stepper, CircularProgress } from '@mui/material';
+import { useFormik } from 'formik';
+import { useEffect, useState } from 'react';
+
+import {
+  setNestedTouched,
+  validateCurrentStep,
+} from '../helpers/formikHelpers';
+import {
+  STEP_FIELDS,
+  getValidationSchemaForStep,
+  initialValues,
+  stepFormConfigs,
+  validationSchemas,
+} from './Config/formConfig';
+import useFetchForStep from './hooks/useFetchForStep';
+import OnBoardingPermohonan from './OnBoarding';
+import IdentitasPemberi from './view/IdentitasPemberi';
+import IdentitasPenerima from './view/IdentitasPenerima';
+import InformasiJaminan from './view/InformasiJaminan';
+import KonfirmasiDataDetail from './view/KonfirmasiData';
+import ObyekJaminan from './view/ObyekJaminan';
+import PembayaranPage from './view/Pembayaran';
+import SuccessPage from './view/SuccessPage';
+import FidusiaPendaftaranService from '@/services/fidusia/FidusiaPendaftarServices';
+import { useFetchFidusiaPendaftaran } from './hooks/useFetchFidusia';
+import { useNavigate } from 'react-router-dom';
+import sleep from '@/utils/sleep';
+
+export default function FormPendaftaranFidusia({
+  label = 'Permohonan Pendaftaran Fidusia',
+}) {
+  const id_pendaftaran = localStorage.getItem('id_pendaftaran');
+  const navigate = useNavigate();
+  const [activeStep, setActiveStep] = useState(0);
+  const [skipped, setSkipped] = useState(new Set());
+  const [stepErrors, setStepErrors] = useState({});
+  const [completedSteps, setCompletedSteps] = useState(new Set());
+  const toastifyService = new ToastifyService();
+  const isStepSkipped = (step) => skipped.has(step);
+  const [loading, setLoading] = useState(false);
+
+  const fetchStepData = useFetchForStep(id_pendaftaran);
+
+  const formik = useFormik({
+    validateOnBlur: true,
+    validateOnChange: true,
+    validateOnMount: false,
+    initialValues: initialValues,
+    validationSchema: () => {
+      return getValidationSchemaForStep(activeStep);
+    },
+    onSubmit: (values) => {
+      console.log('🚀 ~ Pendaftaran ~ values:', values);
+
+      toastifyService.confirmationCreate().then((res) => {
+        if (res) {
+          const payload = { ...values };
+          navigate('/fidusia/daftar-fidusia', {
+            state: {
+              newEntry: payload,
+            },
+          });
+          localStorage.removeItem('id_pendaftaran');
+          sleep(2000);
+          // toastifyService.customWarningMsg('API Belum tersedia');
+        }
+      });
+    },
+  });
+
+  const {
+    loading: loadingDetail,
+    error,
+    onFetchLoadFidusiaPendaftaran,
+  } = useFetchFidusiaPendaftaran(formik);
+
+  // Gunakan useEffect dengan dependency array kosong
+  useEffect(() => {
+    const fetchData = async () => {
+      await onFetchLoadFidusiaPendaftaran();
+    };
+
+    fetchData();
+  }, []); // Dependency array kosong
+
+  useEffect(() => {
+    setActiveStep(4);
+    // formik.resetForm();
+    setStepErrors({});
+    setCompletedSteps(new Set());
+  }, [label]);
+
+  const handleNext = async () => {
+    try {
+      setLoading(true);
+
+      const validation = await validateCurrentStep(
+        formik,
+        activeStep,
+        validationSchemas,
+        STEP_FIELDS
+      );
+      console.log('validation', validation);
+      console.log('activeStep', activeStep);
+
+      if (validation.isValid) {
+        const responseStep = await fetchStepData(
+          activeStep,
+          formik,
+          stepFormConfigs
+        );
+        // console.log('respoonseStep', responseStep);
+
+        if (responseStep) {
+          let idPendaftaran = null;
+
+          // Prioritaskan ID dari response
+          if (responseStep.data?.id_pendaftaran) {
+            idPendaftaran = responseStep.data.id_pendaftaran;
+          }
+          // Jika tidak ada di response, cek di localStorage
+          else {
+            const storedIdPendaftaran = localStorage.getItem('id_pendaftaran');
+
+            if (storedIdPendaftaran) {
+              try {
+                // Parse JSON jika disimpan sebagai string JSON
+                idPendaftaran = JSON.parse(storedIdPendaftaran);
+              } catch (error) {
+                // Jika parsing gagal, gunakan value asli
+                idPendaftaran = storedIdPendaftaran;
+              }
+            }
+          }
+          if (idPendaftaran) {
+            localStorage.setItem(
+              'id_pendaftaran',
+              JSON.stringify(idPendaftaran)
+            );
+          }
+
+          // Clear any errors for the current step
+          const newStepErrors = { ...stepErrors };
+          delete newStepErrors[activeStep];
+          setStepErrors(newStepErrors);
+
+          // Mark current step as completed
+          setCompletedSteps((prev) => new Set([...prev, activeStep]));
+
+          // Move to the next step
+          setActiveStep((prevActiveStep) => prevActiveStep + 1);
+
+          // Update skipped steps
+          setSkipped((prevSkipped) => {
+            const newSkipped = new Set(prevSkipped.values());
+            newSkipped.delete(activeStep);
+            return newSkipped;
+          });
+        }
+      } else {
+        // If invalid, set touched for errors
+        setNestedTouched(formik, validation.errors);
+
+        // Store errors for the current step
+        setStepErrors((prev) => ({
+          ...prev,
+          [activeStep]: validation.errors,
+        }));
+      }
+    } catch (error) {
+      // setLoading(false);
+      console.error('Validation error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (status) => {
+    // Validate all steps before submit
+    let hasErrors = false;
+    const allStepErrors = {};
+
+    for (let i = 0; i < STEP_FIELDS.length; i++) {
+      if (i === 2) continue; //lewati identity_penerima.
+
+      const stepSchema = validationSchemas[i];
+      const stepFieldsList = STEP_FIELDS[i];
+
+      // console.log('stepSchema', stepSchema);
+      // console.log('stepFieldsList', stepFieldsList);
+
+      if (!stepSchema) continue;
+
+      try {
+        const stepValues = stepFieldsList.reduce((acc, field) => {
+          acc[field] = formik.values[field];
+          return acc;
+        }, {});
+
+        // console.log('stepValues', stepValues);
+
+        await stepSchema.validate(stepValues, { abortEarly: false });
+      } catch (error) {
+        hasErrors = true;
+        const fieldErrors = {};
+        if (error.inner) {
+          error.inner.forEach((err) => {
+            fieldErrors[err.path] = err.message;
+          });
+        }
+        allStepErrors[i] = fieldErrors;
+      }
+    }
+
+    console.log('allStepErrors', allStepErrors);
+
+    if (!hasErrors) {
+      formik.setFieldValue('status', status);
+      formik.submitForm();
+    } else {
+      setStepErrors(allStepErrors);
+
+      // Set all field errors to formik
+      const allFieldErrors = {};
+      Object.values(allStepErrors).forEach((stepError) => {
+        Object.assign(allFieldErrors, stepError);
+      });
+
+      formik.setErrors(allFieldErrors);
+
+      // Mark all fields as touched
+      const allFields = STEP_FIELDS.flat();
+      const touchedFields = allFields.reduce((acc, field) => {
+        acc[field] = true;
+        return acc;
+      }, {});
+
+      formik.setTouched(touchedFields);
+
+      toastifyService.customWarningMsg(
+        'Terdapat kesalahan pada form. Mohon periksa kembali.'
+      );
+
+      const firstErrorStep = Object.keys(allStepErrors)[1];
+      if (firstErrorStep) {
+        setActiveStep(parseInt(firstErrorStep));
+      }
+    }
+  };
+
+  const allSteps = [
+    {
+      id: '1',
+      label: 'Boarding',
+      component: (
+        <OnBoardingPermohonan
+          formik={formik}
+          setActiveStep={setActiveStep}
+          label={label}
+        />
+      ),
+    },
+    {
+      id: '2',
+      label: 'Identitas Pemberi',
+      stepNumber: 'Langkah 1',
+      component: <IdentitasPemberi formik={formik} />,
+    },
+    {
+      id: '3',
+      label: 'Identitas Penerima',
+      stepNumber: 'Langkah 2',
+      component: <IdentitasPenerima formik={formik} />,
+    },
+    {
+      id: '4',
+      label: 'Informasi Jaminan',
+      stepNumber: 'Langkah 3',
+      component: <InformasiJaminan formik={formik} />,
+    },
+    {
+      id: '5',
+      label: 'Obyek Jaminan',
+      stepNumber: 'Langkah 4',
+      component: <ObyekJaminan formik={formik} />,
+    },
+    {
+      id: '6',
+      label: 'Konfirmasi Data',
+      stepNumber: 'Langkah 5',
+      component: (
+        <KonfirmasiDataDetail formik={formik} setActiveStep={setActiveStep} />
+      ),
+    },
+    {
+      id: '7',
+      label: 'Pembayaran',
+      stepNumber: 'Langkah 6',
+      component: <PembayaranPage formik={formik} />,
+    },
+    {
+      id: '8',
+      label: 'Success',
+      stepNumber: 'Langkah 7',
+      component: <SuccessPage formik={formik} />,
+    },
+  ];
+
+  const stepsConfig = {
+    'Permohonan Pendaftaran Fidusia': ['1', '2', '3', '4', '5', '6', '7', '8'],
+  };
+
+  const activeStepIds = stepsConfig[label] || [];
+  const stepsResult = allSteps.filter((step) =>
+    activeStepIds.includes(step.id)
+  );
+
+  const visibleStepperSteps = stepsResult.filter((s) => s.stepNumber);
+  const stepperActiveStep = visibleStepperSteps.findIndex(
+    (s) => s.id === stepsResult[activeStep]?.id
+  );
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  if (loadingDetail) {
+    return <CircularProgress />;
+  }
+
+  return (
+    <Box className="bg-white page-content mb-4" sx={{ width: '100%' }}>
+      {/* Page title */}
+      {visibleStepperSteps.length > 0 && stepperActiveStep >= 0 && (
+        <h3
+          className=" mb-4"
+          style={{ fontWeight: 500, fontSize: 24, color: '#262626' }}
+        >
+          Formulir Pendaftaran
+        </h3>
+      )}
+      {/* Stepper */}
+      {visibleStepperSteps.length > 0 && stepperActiveStep >= 0 && (
+        <Stepper
+          activeStep={stepperActiveStep}
+          alternativeLabel
+          // connector={<CustomStepConnector />}
+          sx={{
+            '& .MuiStepConnector-root': {
+              top: 10,
+              left: 'calc(-50% + 16px)',
+              right: 'calc(50% + 16px)',
+            },
+            '& .MuiStepConnector-line': {
+              borderTopStyle: 'dashed',
+              borderTopWidth: 2,
+              color: '#E7E7E7',
+            },
+          }}
+        >
+          {visibleStepperSteps.map((step, index) => {
+            if (isStepSkipped(index)) {
+              stepProps.completed = false;
+            }
+            return (
+              <Step key={step.id}>
+                <StepLabel
+                  StepIconComponent={({ active, completed }) => (
+                    <div
+                      style={{
+                        width: 24,
+                        height: 24,
+                        borderRadius: '50%',
+                        border: '1px solid #E7E7E7',
+                        backgroundColor:
+                          active || completed ? '#041662' : '#fff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: active || completed ? '#fff' : '#041662',
+                        transition: 'all 0.3s ease',
+                      }}
+                    >
+                      {index + 1}
+                    </div>
+                  )}
+                >
+                  <span
+                    style={{
+                      fontFamily: 'Poppins',
+                      fontWeight: 400,
+                      fontSize: '12px',
+                      lineHeight: '18px',
+                      color: '#888888',
+                    }}
+                  >
+                    {step.label}
+                  </span>
+                </StepLabel>
+              </Step>
+            );
+          })}
+        </Stepper>
+      )}
+      {/* Step content */}
+      <>
+        <div className="mt-5 mb-3 px-2">
+          <Box
+            sx={{ border: '1px solid #E7E7E7', borderRadius: 5, padding: 2 }}
+          >
+            {stepsResult[activeStep]?.component || 'Unknown step'}
+
+            {activeStep >= 1 && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'flex-end',
+                  pt: 2,
+                  px: 2,
+                }}
+              >
+                <CustomButton
+                  text={'Kembali'}
+                  bgColor="transparent"
+                  border="1px solid #E7E7E7"
+                  textColor="#041662"
+                  disabled={activeStep === 0}
+                  onClick={handleBack}
+                />
+                <CustomButton
+                  text={'Simpan Draft'}
+                  bgColor="#f97316"
+                  border="1px solid #E7E7E7"
+                  textColor="#fff"
+                  hoverColor="#ea580c"
+                  disabled={activeStep === 0}
+                  onClick={() => handleSubmit('draf')}
+                />
+                <CustomButton
+                  loading={loading}
+                  onClick={() => {
+                    if (activeStep === stepsResult.length - 1) {
+                      handleSubmit('submit');
+                    } else {
+                      handleNext();
+                    }
+                  }}
+                  text={
+                    activeStep === stepsResult.length - 1
+                      ? 'Selesai'
+                      : 'Selanjutnya'
+                  }
+                  rightIcon={<ArrowForward fontSize="14" />}
+                />
+              </Box>
+            )}
+          </Box>
+        </div>
+      </>
+    </Box>
+  );
+}

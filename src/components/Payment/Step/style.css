@@ -1,0 +1,61 @@
+.nota-dinas3 {
+  font-family: Arial, sans-serif;
+  margin: 0 auto;
+  padding: 20px;
+  max-width: 250mm;
+  width: 100%;
+  height: 130mm; /* Set the height to match A4 size */
+  /* border: 1px solid #E7E7E7; */
+  background-color: #fff;
+
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+  font-family: 'Arial', sans-serif;
+  
+}
+
+.official-title {
+  margin: 0;
+  font-size: 18px; /* Adjust size as needed */
+  font-weight: bold;
+  text-transform: uppercase; /* Capitalize the text for emphasis */
+}
+
+.letter {
+  font-family: Arial, sans-serif;
+  margin: 2rem;
+  padding: 2rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.letter-header {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.letter-subheader {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+}
+
+.intro,
+.conclusion,
+.closing {
+  margin-bottom: 1.5rem;
+}
+
+.details {
+  margin-bottom: 1.5rem;
+}
+
+.details p {
+  margin: 0.5rem 0;
+}
