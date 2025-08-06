@@ -1,0 +1,1 @@
+import{j as s,b as i,c as o,b8 as a}from"./index-cb7bfd5e.js";const e=(r,d)=>s.jsxs(i,{className:"mb-2",children:[s.jsx(o,{xs:"4",md:"4",lg:"5",children:s.jsx(a,{variant:"body2",fontWeight:"bold",children:r})}),s.jsx(o,{xs:"8",md:"8",lg:"7",children:s.jsxs(a,{variant:"body2",children:[": ",d||"-"]})})]});export{e as R};

@@ -1,0 +1,1 @@
+import{p as a,cm as e,q as i}from"./index-cb7bfd5e.js";const m=a().shape({jumlahPembelian:e().typeError("Harus berupa angka").required("Jumlah pembelian wajib diisi").min(1,"Jumlah pembelian minimal 1"),subLayanan:i().required("Sub layanan wajib dipilih")});export{m as c};
